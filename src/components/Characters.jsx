@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react'
+import React, { useState, useEffect, useReducer, useMemo } from 'react'
 
 const initialState = {
   favorites: []
@@ -19,6 +19,7 @@ const favoriteReducer = (state, action) => {
 const Characters = () => {
   const [characters, setCharacters] = useState([])
   const [favorites, dispatch] = useReducer(favoriteReducer, initialState);
+  const [search, setSearch] = useState('')
 
   console.log('FAVORITOS', favorites)
 
@@ -32,15 +33,31 @@ const Characters = () => {
     dispatch({ type: 'ADD_TO_FAVORITE', payload: favorite })
   }
 
+  const handleSearch = (event) => {
+    setSearch(event.target.value)
+  }
+
+  // const filteredUser = characters.filter((user) => {
+  //   return user.name.toLowerCase().includes(search.toLowerCase());
+  // })
+
+  const filteredUser = useMemo(() =>
+    characters.filter((user) => {
+      return user.name.toLowerCase().includes(search.toLowerCase());
+    }), [characters, search])
+
   return (
     <div className='Characters'>
+      <div className="search">
+        <input type="text" value={search} onChange={handleSearch} />
+      </div>
       {favorites.favorites.map(favorite => (
         <li key={favorite.id}>
           {favorite.name}
         </li>
       ))}
-
-      {characters.map(character => (
+      {/* utilizamos filterdUser en vez de characteres */}
+      {filteredUser.map(character => (
         <div className='item' key={character.id}>
           <img src={character.image} alt='imagen' />
           <h2>{character.name}</h2>
